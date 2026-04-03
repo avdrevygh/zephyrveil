@@ -30,9 +30,9 @@ dev = ["python-dotenv"]
 zephyrveil = "zephyrveil.main:main"
 
 [project.urls]
-Homepage = "https://github.com/YOURUSERNAME/zephyrveil"
-Repository = "https://github.com/YOURUSERNAME/zephyrveil"
-Issues = "https://github.com/YOURUSERNAME/zephyrveil/issues"
+Homepage = "https://github.com/avdrevygh/zephyrveil"
+Repository = "https://github.com/avdrevygh/zephyrveil"
+Issues = "https://github.com/avdrevygh/zephyrveil/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/zephyrveil"]

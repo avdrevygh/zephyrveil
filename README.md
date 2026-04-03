@@ -315,10 +315,11 @@ pip install -r requirements.txt
 
 | | |
 |---|---|
-| **Developer** | Your Name / Your Handle |
-| **Location** | Your Country |
+| **Developer** | Andre J (Albin S) / @avdrevygh |
+| **Location** | The Grid |
 | **Background** | Cybersecurity, Ethical Hacking, Linux, Privacy |
 | **GitHub** | [github.com/avdrevygh](https://github.com/avdrevygh) |
+| **GitHub** | [avdre.pages.dev](https://avdre.pages.dev) |
 
 > *Feel free to open an issue or suggest a feature.*
 
