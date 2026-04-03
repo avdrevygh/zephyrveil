@@ -16,52 +16,124 @@ A powerful CLI security console for Linux — inspired by Metasploit's interface
 
 ---
 
+## Preview
+
+<!-- Add a screenshot of Zephyrveil running in your terminal here -->
+<!-- Take a screenshot, create a screenshots/ folder in this repo, upload it, then uncomment below -->
+
+> *Screenshot coming soon*
+<img src="bannpic.png">
+<!--
+![Zephyrveil in action](screenshots/zephyrveil-scan.png)
+-->
+
+---
+
 ## Features
 
-- **Log Parsing** — journalctl and /var/log/auth.log with custom file support
+- **Interactive Console** — Metasploit-style CLI with `use`, `run`, `back`, `show options`
+- **Log Parsing** — journalctl and `/var/log/auth.log` with custom file support
 - **5 Threat Types** — SSH brute force, credential stuffing, root login, sudo abuse, repeated auth failures
 - **Threat Intelligence** — IPInfo, AbuseIPDB, VirusTotal, Shodan, Fail2ban
 - **System Audit** — security tools, open ports, firewall, SSH config, LUKS, sudo
 - **CVE Check** — checks installed packages against NVD/NIST database
-- **Reports** — PDF + JSON with full timestamp, never overwrites
-- **Telegram Alerts** — auto-sends when threats are detected
+- **Reports** — PDF + JSON with full timestamp, never overwrites old reports
+- **Telegram Alerts** — auto-sends when threats are detected during scan
 - **Full History** — everything stored in SQLite, full history never deleted
-- **Metasploit-style console** — use/run/back/show options pattern
+- **Zero config** — auto-creates all files and directories on first run
 
 ---
 
-## Install
+## Install & Run
+
+Zephyrveil runs from source. Clone the repo, install dependencies, and run. That's it.
+
+---
+
+### Method 1 — uv (Recommended)
+
+`uv` is a modern Python package manager — much faster than pip and handles virtual environments automatically. This is the recommended way.
+
+**Why uv?**
+- Installs dependencies in seconds instead of minutes
+- Automatically creates and manages the virtual environment for you
+- No need to manually activate/deactivate anything
+- Single command to run the project
+
+**Install uv first (one time only):**
 
 ```bash
-# Recommended — install via uv
-uv tool install zephyrveil
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-# Or via pip
-pip install zephyrveil
+Then restart your terminal or run:
 
-# Or run from source
+```bash
+source $HOME/.local/bin/env
+```
+
+**Clone and run Zephyrveil:**
+
+```bash
 git clone https://github.com/avdrevygh/zephyrveil
 cd zephyrveil
 uv sync
-uv run python -m zephyrveil
+uv run zephyrveil
 ```
 
-After install, just type:
+That is all. `uv sync` installs all dependencies, `uv run zephyrveil` launches the tool.
+
+**Next time you want to run it:**
+
 ```bash
-zephyrveil
+cd zephyrveil
+uv run zephyrveil
+```
+
+---
+
+### Method 2 — pip (Standard Python)
+
+If you prefer not to install uv or want to use standard Python tools:
+
+```bash
+git clone https://github.com/avdrevygh/zephyrveil
+cd zephyrveil
+
+# Create a virtual environment
+python3 -m venv .venv
+
+# Activate it
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run
+python -m zephyrveil
+```
+
+**Next time you want to run it:**
+
+```bash
+cd zephyrveil
+source .venv/bin/activate
+python -m zephyrveil
 ```
 
 ---
 
 ## First Run
 
-On first run, Zephyrveil automatically creates:
+On first run, Zephyrveil automatically creates everything it needs — no manual setup required:
 
-- `~/.config/zephyrveil/config.toml` — configuration file
-- `~/.local/share/zephyrveil/zephyrveil.db` — SQLite database
-- `~/Documents/zephyrveil/` — reports output directory
+| Path | Purpose |
+|------|---------|
+| `~/.config/zephyrveil/config.toml` | Configuration and API keys |
+| `~/.local/share/zephyrveil/zephyrveil.db` | SQLite database |
+| `~/Documents/zephyrveil/` | PDF and JSON reports output |
 
-No manual setup needed.
+After first launch run `use doctor` to check your setup and see what API keys are needed.
 
 ---
 
@@ -70,13 +142,13 @@ No manual setup needed.
 ```
 zephyrveil > help            # Show all commands
 zephyrveil > show options    # List all modules
-zephyrveil > use scan        # Run full scan (recommended)
-zephyrveil > use log         # Parse logs + enrich IPs
-zephyrveil > use ip          # Investigate single IP
-zephyrveil > use health      # System security audit
+zephyrveil > use scan        # Run full scan (recommended start)
+zephyrveil > use log         # Parse logs and enrich all IPs
+zephyrveil > use ip          # Investigate a single IP address
+zephyrveil > use health      # Full system security audit
 zephyrveil > use report      # Generate report from last scan
-zephyrveil > use doctor      # Self-diagnostic
-zephyrveil > use alerts      # Configure Telegram
+zephyrveil > use doctor      # Self-diagnostic — check everything
+zephyrveil > use alerts      # Configure Telegram alerts
 zephyrveil > clear           # Clear screen
 zephyrveil > exit            # Quit
 ```
@@ -103,37 +175,49 @@ scan > run
 
 ## CLI Flags (non-interactive)
 
+Run Zephyrveil directly from terminal without entering the console:
+
 ```bash
-zephyrveil --scan            # Run full scan and exit
-zephyrveil --health          # Run health audit and exit
-zephyrveil --ip 1.2.3.4      # Investigate IP and exit
-zephyrveil --version         # Show version
-zephyrveil --verbose         # Enable verbose output
-zephyrveil --source /path    # Use custom log file
+# uv
+uv run zephyrveil --scan            # Run full scan and exit
+uv run zephyrveil --health          # Run health audit and exit
+uv run zephyrveil --ip 1.2.3.4      # Investigate single IP and exit
+uv run zephyrveil --version         # Show version
+uv run zephyrveil --verbose         # Enable verbose output
+uv run zephyrveil --source /path    # Use custom log file
+
+# pip / venv
+python -m zephyrveil --scan
+python -m zephyrveil --health
+python -m zephyrveil --ip 1.2.3.4
 ```
 
 ---
 
 ## API Keys
 
-Add keys to `~/.config/zephyrveil/config.toml`:
+All API keys are optional. Missing keys are skipped with a warning — Zephyrveil never crashes on a missing key.
+
+Add keys to `~/.config/zephyrveil/config.toml` (auto-created on first run):
 
 ```toml
 [api_keys]
-abuseipdb  = "your_key_here"   # abuseipdb.com/api — 1000/day free
-ipinfo     = "your_key_here"   # ipinfo.io/signup — 50k/month free
-virustotal = "your_key_here"   # virustotal.com/gui/my-apikey — 500/day free
-shodan     = "your_key_here"   # account.shodan.io — limited free
-nvd        = "your_key_here"   # nvd.nist.gov/developers — free
+abuseipdb  = "your_key_here"   # abuseipdb.com/api            — 1000 lookups/day free
+ipinfo     = "your_key_here"   # ipinfo.io/signup              — 50,000/month free
+virustotal = "your_key_here"   # virustotal.com/gui/my-apikey  — 500/day free
+shodan     = "your_key_here"   # account.shodan.io             — limited free tier
+nvd        = "your_key_here"   # nvd.nist.gov/developers       — free
 ```
 
-Missing keys are skipped with a warning — Zephyrveil never crashes.
-
-Run `use doctor` to see which keys are missing and where to get them.
+Run `use doctor` inside the console to see which keys are missing and the exact URL to get each one.
 
 ---
 
 ## Telegram Alerts
+
+Zephyrveil automatically sends a Telegram message when a scan detects threats.
+
+**Setup via config.toml:**
 
 ```toml
 [telegram]
@@ -142,7 +226,8 @@ chat_id   = "your_chat_id"
 enabled   = true
 ```
 
-Or configure via the console:
+**Setup via console:**
+
 ```
 zephyrveil > use alerts
 alerts > set TOKEN your_bot_token
@@ -151,27 +236,34 @@ alerts > set TEST true
 alerts > run
 ```
 
+Get a bot token from [@BotFather](https://t.me/BotFather) on Telegram.
+
 ---
 
 ## Threat Detection Rules
 
-| Threat | Trigger |
-|--------|---------|
-| SSH Brute Force | 5+ failed logins from same IP |
-| Credential Stuffing | 3+ different usernames from same IP |
-| Root Login Attempt | any root SSH login attempt |
-| Sudo Abuse | failed sudo or auth failure |
-| Repeated Auth Failure | 10+ failures for same username |
+| Threat | Trigger | Severity |
+|--------|---------|----------|
+| SSH Brute Force | 5+ failed logins from same IP | CRITICAL |
+| Credential Stuffing | 3+ different usernames from same IP | HIGH |
+| Root Login Attempt | Any root SSH login attempt | HIGH |
+| Sudo Abuse | Failed sudo authentication | MEDIUM |
+| Repeated Auth Failure | 10+ failures for same username | MEDIUM |
 
 ---
 
 ## Reports
 
-Every scan generates:
-- `zephyrveil_report_2025-01-15_14-32-05.pdf`
-- `zephyrveil_report_2025-01-15_14-32-05.json`
+Every scan automatically generates two timestamped report files:
 
-Saved to `~/Documents/zephyrveil/` — never overwrites old reports.
+```
+zephyrveil_report_2025-01-15_14-32-05.pdf
+zephyrveil_report_2025-01-15_14-32-05.json
+```
+
+Saved to `~/Documents/zephyrveil/` — old reports are never overwritten.
+
+Reports contain everything: detected threats, full IP intelligence, system audit results, CVE findings, scan metadata, and timestamps.
 
 ---
 
@@ -179,46 +271,64 @@ Saved to `~/Documents/zephyrveil/` — never overwrites old reports.
 
 All data stored at `~/.local/share/zephyrveil/zephyrveil.db`:
 
-- `scans` — scan sessions
-- `threats` — detected threats
-- `events` — raw log events
-- `ip_intel` — IP intelligence results
-- `audit_results` — system audit data
-- `alerts_sent` — Telegram alert history
+| Table | Contents |
+|-------|---------|
+| `scans` | Every scan session with metadata |
+| `threats` | Every detected threat |
+| `events` | Raw log events |
+| `ip_intel` | IP enrichment results from all APIs |
+| `audit_results` | System audit data |
+| `alerts_sent` | Telegram alert history |
 
-Full history, never deleted.
+Full history — nothing is ever deleted. Query it directly with any SQLite tool.
 
 ---
 
-## Development
+## Keeping Zephyrveil Updated
 
 ```bash
-git clone https://github.com/avdrevygh/zephyrveil
 cd zephyrveil
+git pull
+
+# uv — re-sync dependencies if anything changed
 uv sync
-uv add --dev python-dotenv
 
-# Create .env for API keys during development
-cp .env.example .env
-# Edit .env with your keys
-
-uv run python -m zephyrveil
+# pip — reinstall dependencies if anything changed
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ---
 
 ## Requirements
 
-- Linux (any modern distro)
+- Linux (Arch, Ubuntu, Fedora, Debian — any modern distro)
 - Python 3.11+
-- journalctl OR /var/log/auth.log access
-- Internet connection (for API features)
+- `journalctl` OR `/var/log/auth.log` access
+- Internet connection for API features (works offline without keys)
+
+---
+
+## About the Developer
+
+<!-- Fill in your details — remove any row you don't want public -->
+
+| | |
+|---|---|
+| **Developer** | Your Name / Your Handle |
+| **Location** | Your Country |
+| **Background** | Cybersecurity, Ethical Hacking, Linux, Privacy |
+| **GitHub** | [github.com/avdrevygh](https://github.com/avdrevygh) |
+
+> *Feel free to open an issue or suggest a feature.*
 
 ---
 
 ## License
 
-MIT License — see LICENSE file.
+MIT License — see [LICENSE](LICENSE) file.
+
+Free to use, modify, and distribute.
 
 ---
 
