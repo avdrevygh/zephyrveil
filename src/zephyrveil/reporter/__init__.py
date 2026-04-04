@@ -1,1 +1,1 @@
-"""Reporter package — PDF and JSON report generation."""
+"""Reporter package — PDF, JSON, and HTML report generation."""
