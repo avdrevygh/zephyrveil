@@ -230,11 +230,11 @@ def _run_module_loop(
                     "\001\033[0m\002"
                     "  "
                     "\001\033[32;1m\002"
-                    f"{module_name}"
+                    f"\u27e6{module_name}\u27e7"
                     "\001\033[0m\002"
                     " "
                     "\001\033[1m\002"
-                    ">"
+                    "\u00bb"
                     "\001\033[0m\002"
                     " "
                 )
@@ -355,16 +355,16 @@ def run_console(console: Console, config: dict[str, Any]) -> None:
                 # Without these, backspace eats into the prompt because readline
                 # miscounts the width of the ANSI color escape codes.
                 prompt_str = (
-                    "\001\033[0m\002"  # reset — invisible to readline
-                    "  "  # 2 spaces — visible, counted
-                    "\001\033[36;1m\002"  # bold cyan start — invisible to readline
-                    "zephyrveil"  # text — visible, counted
-                    "\001\033[0m\002"  # reset — invisible
-                    " "  # space — visible
-                    "\001\033[1m\002"  # bold start — invisible
-                    ">"  # > — visible
-                    "\001\033[0m\002"  # reset — invisible
-                    " "  # trailing space — visible
+                    "\001\033[0m\002"
+                    "  "
+                    "\001\033[36;1m\002"
+                    "\u27e6zephyrveil\u27e7"
+                    "\001\033[0m\002"
+                    " "
+                    "\001\033[1m\002"
+                    "\u00bb"
+                    "\001\033[0m\002"
+                    " "
                 )
                 raw = input(prompt_str)
                 cmd = raw.strip()
@@ -379,17 +379,17 @@ def run_console(console: Console, config: dict[str, Any]) -> None:
                         .lower()
                     )
                     if confirm in ("y", "yes"):
-                        console.print("\n  [dim]Goodbye. Stay safe.[/dim]\n")
+                        console.print("\n [dim]session ended — stay safe.[/dim]\n")
                         sys.exit(0)
                     else:
                         continue
                 except (KeyboardInterrupt, EOFError):
-                    console.print("\n  [dim]Goodbye. Stay safe.[/dim]\n")
+                    console.print("\n [dim]session ended — stay safe.[/dim]\n")
                     sys.exit(0)
 
             except EOFError:
                 # Ctrl+D — clean exit
-                console.print("\n  [dim]Goodbye. Stay safe.[/dim]\n")
+                console.print("\n [dim]session ended — stay safe.[/dim]\n")
                 sys.exit(0)
 
             # Empty input — show prompt again
@@ -401,17 +401,40 @@ def run_console(console: Console, config: dict[str, Any]) -> None:
 
             # ── exit / quit ──────────────────────────────────────────────
             if cmd_lower in ("exit", "quit", "q"):
-                console.print("\n  [dim]Goodbye. Stay safe.[/dim]\n")
+                console.print("\n [dim]session ended — stay safe.[/dim]\n")
                 sys.exit(0)
 
             # ── help ─────────────────────────────────────────────────────
             elif cmd_lower in ("help", "?", "h"):
                 console.print()
-                console.rule(
-                    "[bold cyan]  Zephyrveil Help  [/bold cyan]", style="dim cyan"
-                )
+                console.rule("[bold cyan]  ⟦ ZEPHYRVEIL HELP ⟧  [/bold cyan]", style="cyan")
                 console.print()
-                print_help_table(console, MAIN_HELP_COMMANDS)
+                # Main commands group
+                console.print("  [bold white]CONSOLE[/bold white]")
+                print_help_table(console, [
+                    ("help",           "Show this help menu"),
+                    ("show options",   "List all available modules"),
+                    ("clear",          "Clear screen and scrollback"),
+                    ("exit / quit",    "Exit Zephyrveil"),
+                ])
+                console.print("  [bold white]MODULES[/bold white]")
+                print_help_table(console, [
+                    ("use scan",       "Full threat detection scan — runs everything"),
+                    ("use log",        "Parse logs and enrich all IPs found"),
+                    ("use ip",         "Investigate a single IP address"),
+                    ("use health",     "Run a full system security audit"),
+                    ("use history",    "Show recent scan history"),
+                    ("use report",     "Generate report from last scan"),
+                    ("use doctor",     "Self-diagnostic — check API keys, config, DB"),
+                    ("use alerts",     "Configure and test Telegram alerts"),
+                ])
+                console.print("  [bold white]INSIDE A MODULE[/bold white]")
+                print_help_table(console, [
+                    ("show options",   "Show current option values"),
+                    ("set OPTION val", "Change an option"),
+                    ("run",            "Execute the module"),
+                    ("back",           "Return to main console"),
+                ])
 
             # ── show options / show modules ──────────────────────────────
             elif cmd_lower in ("show options", "show modules", "list", "modules"):

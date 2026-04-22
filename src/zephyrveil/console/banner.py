@@ -27,16 +27,16 @@ _BANNER_SHOWN: bool = False
 
 # ── The ASCII art banner text ────────────────────────────────────────────────
 BANNER_ART = """[bold cyan]
-███████╗███████╗██████╗ ██╗  ██╗██╗   ██╗██████╗ ██╗   ██╗███████╗██╗██╗
-╚══███╔╝██╔════╝██╔══██╗██║  ██║╚██╗ ██╔╝██╔══██╗██║   ██║██╔════╝██║██║
-  ███╔╝ █████╗  ██████╔╝███████║ ╚████╔╝ ██████╔╝██║   ██║█████╗  ██║██║
- ███╔╝  ██╔══╝  ██╔═══╝ ██╔══██║  ╚██╔╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██║██║
-███████╗███████╗██║     ██║  ██║   ██║   ██║  ██║ ╚████╔╝ ███████╗██║███████╗
-╚══════╝╚══════╝╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝╚══════╝
+  ███████╗███████╗██████╗ ██╗  ██╗██╗   ██╗██████╗ ██╗   ██╗███████╗██╗██╗
+  ╚══███╔╝██╔════╝██╔══██╗██║  ██║╚██╗ ██╔╝██╔══██╗██║   ██║██╔════╝██║██║
+    ███╔╝ █████╗  ██████╔╝███████║ ╚████╔╝ ██████╔╝██║   ██║█████╗  ██║██║
+   ███╔╝  ██╔══╝  ██╔═══╝ ██╔══██║  ╚██╔╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██║██║
+  ███████╗███████╗██║     ██║  ██║   ██║   ██║  ██║ ╚████╔╝ ███████╗██║███████╗
+  ╚══════╝╚══════╝╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝╚══════╝
 [/bold cyan]"""
 
-BANNER_SUBTITLE = "[bold white]         Linux Threat Detection & Security Intelligence  •  v1.0.0[/bold white]"
-
+BANNER_SUBTITLE = "[bold white]   Linux Threat Detection  [dim]•[/dim]  Security Intelligence  [dim]•[/dim]  IP Intelligence[/bold white]"
+BANNER_VERSION  = "[white]   v1.0.0  |  Linux[/white]"
 BANNER_META = """[dim]  ─────────────────────────────────────────────────────────────────────────
    Developed by  : Andre J (Albin S) / https://avdre.pages.dev
    Platform      : Linux only  •  Python 3.11+
@@ -68,15 +68,14 @@ def show_splash(console: Console, config: dict[str, Any], db_ok: bool) -> None:
         console.print()
         bar_width = 40
         for i in range(bar_width + 1):
-            # Build the progress bar character by character
-            filled = "█" * i
-            empty = "░" * (bar_width - i)
-            pct = int((i / bar_width) * 100)
+            filled = "▰" * i
+            empty  = "▱" * (bar_width - i)
+            pct    = int((i / bar_width) * 100)
             console.print(
-                f"    [cyan][{filled}{empty}][/cyan] [dim]{pct}%  Initializing...[/dim]",
+                f"    [bold cyan][{filled}{empty}][/bold cyan] [bold white]{pct:>3}%[/bold white]  [dim]Loading...[/dim]",
                 end="\r",
             )
-            time.sleep(0.02)  # Fast but visible animation
+            time.sleep(0.02)
 
         console.print()  # Newline after bar
         console.print()
@@ -182,7 +181,8 @@ def show_banner(console: Console) -> None:
     try:
         console.print(BANNER_ART)
         console.print(BANNER_SUBTITLE)
-        console.print()
+        console.print(BANNER_VERSION)
+      #  console.print()
         console.print(BANNER_META)
         console.print(BANNER_TAGLINE)
         console.print()
