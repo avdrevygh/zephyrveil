@@ -16,7 +16,7 @@ A powerful CLI security console for Linux — inspired by Metasploit's interface
 
 ---
 
-## Preview
+## Preview Added
 
 <!-- Add a screenshot of Zephyrveil running in your terminal here -->
 <!-- Take a screenshot, create a screenshots/ folder in this repo, upload it, then uncomment below -->
